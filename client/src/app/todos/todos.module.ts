@@ -13,8 +13,7 @@ import { EditTodoComponent } from './components/edit-todo/edit-todo.component';
 import { DeleteTodoComponent } from './components/delete-todo/delete-todo.component';
 import { ViewTodoComponent } from './components/view-todo/view-todo.component';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
-
-
+import { HttpClientModule, HttpClient } from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -26,6 +25,7 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
   imports: [
     CommonModule,
     FormsModule,
+    HttpClientModule,
     ReactiveFormsModule,
     MatDialogModule,
     MatIconModule,
@@ -35,6 +35,9 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
     MatTableModule,
     MatGridListModule,
     TodosRoutingModule
+  ],
+  providers: [
+    HttpClient
   ]
 })
 export class TodosModule { }

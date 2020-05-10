@@ -1,9 +1,14 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { EditTodoComponent } from './components/edit-todo/edit-todo.component';
 import { DeleteTodoComponent } from './components/delete-todo/delete-todo.component';
 import { ViewTodoComponent } from './components/view-todo/view-todo.component';
 import ITodo from './models/todo';
+import { Store, select } from '@ngrx/store';
+import { ITodoState } from '../store/state/todo.state';
+import { Observable, Subscription } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { GetTodos } from '../store/actions/todo.actions';
 
 export interface PeriodicElement {
   name: string;
@@ -30,8 +35,10 @@ const ELEMENT_DATA: Array<PeriodicElement> = [
   templateUrl: './todos.component.html',
   styleUrls: ['./todos.component.scss']
 })
-export class TodosComponent {
+export class TodosComponent implements OnInit, OnDestroy {
 
+  todosSubscription: Subscription;
+  todo$: Observable<ITodoState>;
   displayedColumns: string[] = ['position', 'name', 'weight', 'symbol', 'actions'];
   dataSource = ELEMENT_DATA;
   editDialogRef: MatDialogRef<EditTodoComponent>;
@@ -92,6 +99,21 @@ export class TodosComponent {
       .save.subscribe((todo: ITodo) => this.editDialogRef.close());
   }
 
-  constructor(private dialog: MatDialog) { }
+  constructor(private dialog: MatDialog, private store: Store<{ todos: ITodoState }>) {
+    this.todo$ = this.store.pipe(select('todos'));
+  }
+  ngOnDestroy(): void {
+    if (this.todosSubscription) {
+      this.todosSubscription.unsubscribe();
+    }
+  }
+
+  ngOnInit(): void {
+    this.todosSubscription = this.todo$.pipe(
+      map(p => p.todos)
+    ).subscribe();
+
+    this.store.dispatch(new GetTodos());
+  }
 
 }
