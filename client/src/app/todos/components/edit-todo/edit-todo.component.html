@@ -1,0 +1,30 @@
+<h1 mat-dialog-title>Add</h1>
+<div mat-dialog-content>
+    <mat-form-field>
+        <mat-label>Title</mat-label>
+        <input matInput [(ngModel)]="todo.title">
+    </mat-form-field>
+    <mat-form-field>
+        <mat-label>Due Date</mat-label>
+        <input matInput [(ngModel)]="todo.dueDate">
+    </mat-form-field>
+    <mat-form-field>
+        <mat-label>Priority</mat-label>
+        <select matNativeControl [(ngModel)]="todo.priority">
+            <option value="2">High</option>
+            <option value="1">Medium</option>
+            <option value="0">Low</option>
+        </select>
+    </mat-form-field>
+    <mat-form-field>
+        <mat-label>Notes</mat-label>
+        <textarea
+            [(ngModel)]="todo.notes"
+            matInput 
+            cdkTextareaAutosize></textarea>
+    </mat-form-field>
+</div>
+<div mat-dialog-actions>
+  <button mat-button (click)="onCancelClick()">Cancel</button>
+  <button mat-button (click)="onSaveClick(todo)" cdkFocusInitial>Save</button>
+</div>
