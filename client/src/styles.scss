@@ -13,10 +13,10 @@ body {
     font-family: Roboto, "Helvetica Neue", sans-serif;
 }
 
-.mat-snack-bar-container.succssSnackBar {
+.mat-snack-bar-container.succss-snackbar {
     background-color: map-get($mat-green, 'darker');
 }
 
-.mat-snack-bar-container.warningSnackBar {
+.mat-snack-bar-container.warning-snackbar {
     background-color: map-get($mat-red, 'darker');
 }

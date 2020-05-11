@@ -1,15 +1,15 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewEncapsulation } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Actions, ofType } from '@ngrx/effects';
 import { Observable, Subscription } from 'rxjs';
-import { TodoActionTypes, DeleteTodoFailure } from './store/actions/todo.actions';
+import { TodoActionTypes } from './store/actions/todo.actions';
 import { tap } from 'rxjs/operators';
-import { Action } from 'rxjs/internal/scheduler/Action';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  styleUrls: ['./app.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
 export class AppComponent implements OnInit, OnDestroy {
   title = 'client';
@@ -56,8 +56,8 @@ export class AppComponent implements OnInit, OnDestroy {
       tap(() => {
         this.snackBar.open('Error Retrieving Todos!', 'Error', {
           verticalPosition: 'top',
-          panelClass: 'warningSnackBar',
-          duration: 100000
+          panelClass: ['warning-snackbar'],
+          duration: 10000
         });
       })
     ).subscribe();
@@ -67,7 +67,7 @@ export class AppComponent implements OnInit, OnDestroy {
       tap(() => {
         this.snackBar.open('Error Retrieving Todo!', 'Error', {
           verticalPosition: 'top',
-          panelClass: 'warningSnackBar',
+          panelClass: 'warning-snackbar',
           duration: 10000
         });
       })
