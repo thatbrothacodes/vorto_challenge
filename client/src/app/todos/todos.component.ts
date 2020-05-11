@@ -7,8 +7,11 @@ import ITodo from './models/todo';
 import { Store, select } from '@ngrx/store';
 import { ITodoState } from '../store/state/todo.state';
 import { Observable, Subscription } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { GetTodos } from '../store/actions/todo.actions';
+import { map, tap } from 'rxjs/operators';
+import { GetTodos, GetTodo, EditTodo, DeleteTodo, CreateTodo, TodoActionTypes } from '../store/actions/todo.actions';
+import { SelectionModel } from '@angular/cdk/collections';
+import { MatTableDataSource } from '@angular/material/table';
+import { Actions, ofType } from '@ngrx/effects';
 
 export interface PeriodicElement {
   name: string;
@@ -38,79 +41,196 @@ const ELEMENT_DATA: Array<PeriodicElement> = [
 export class TodosComponent implements OnInit, OnDestroy {
 
   todosSubscription: Subscription;
+  createTodoSuccessSubscription: Subscription;
+  deleteTodoSuccessSubscription: Subscription;
+  editTodoSuccessSubscription: Subscription;
   todo$: Observable<ITodoState>;
-  displayedColumns: string[] = ['position', 'name', 'weight', 'symbol', 'actions'];
-  dataSource = ELEMENT_DATA;
   editDialogRef: MatDialogRef<EditTodoComponent>;
   deleteDialogRef: MatDialogRef<DeleteTodoComponent>;
   viewDialogRef: MatDialogRef<ViewTodoComponent>;
 
+  displayedColumns: string[] = ['select', 'name', 'weight', 'symbol', 'actions'];
+  dataSource = new MatTableDataSource<PeriodicElement>(ELEMENT_DATA);
+  initialSelection = [];
+  allowMultiSelect = true;
+  selection = new SelectionModel<PeriodicElement>(this.allowMultiSelect, this.initialSelection);
+  id: number;
+  todos: Array<ITodo> = [];
+  todo: ITodo = undefined;
+
   onEditClick = (id) => {
+    console.log(id);
+    this.id = id;
+    this.store.dispatch(new GetTodo(id));
+
     this.editDialogRef = this.dialog.open(EditTodoComponent, {
       width: '400px',
-      data: {
-        id
-      }
+      data: this.todo ? this.todo : {} as ITodo
     });
 
     this.editDialogRef.componentInstance
-      .cancel.subscribe(() => this.editDialogRef.close());
+      .cancel.subscribe(() => {
+
+        this.todo = undefined;
+        this.editDialogRef.close();
+
+      });
+
     this.editDialogRef.componentInstance
-      .save.subscribe((todo: ITodo) => this.editDialogRef.close());
+      .save.subscribe((todo: ITodo) => {
+
+        this.store.dispatch(new EditTodo(todo));
+        this.editDialogRef.close();
+
+      });
   }
 
   onDeleteClick = (id) => {
+
+    this.id = id;
+    this.store.dispatch(new GetTodo(id));
+
     this.deleteDialogRef = this.dialog.open(DeleteTodoComponent, {
       width: '250px',
-      data: {
-        id
-      }
+      data: this.todo
     });
 
     this.deleteDialogRef.componentInstance
-      .cancel.subscribe(() => this.deleteDialogRef.close());
+      .cancel.subscribe(() => {
+
+        this.todo = undefined;
+        this.deleteDialogRef.close();
+
+      });
+
     this.deleteDialogRef.componentInstance
-      .delete.subscribe((todoId: number) => this.deleteDialogRef.close());
+      .delete.subscribe((todoId: number) => {
+
+        this.store.dispatch(new DeleteTodo(todoId));
+        this.deleteDialogRef.close();
+
+      });
   }
 
   onViewClick = (id) => {
+
+    this.id = id;
+    this.store.dispatch(new GetTodo(id));
+
     this.viewDialogRef = this.dialog.open(ViewTodoComponent, {
       width: '400px',
-      data: {
-        id
-      }
+      data: this.todo
     });
 
     this.viewDialogRef.componentInstance
-      .cancel.subscribe(() => this.viewDialogRef.close());
+      .cancel.subscribe(() => {
+
+        this.todo = undefined;
+        this.viewDialogRef.close();
+
+      });
+
     this.viewDialogRef.componentInstance
-      .edit.subscribe((todo: ITodo) => this.viewDialogRef.close());
+      .edit.subscribe(() => {
+
+        this.store.dispatch(new GetTodo(id));
+        this.viewDialogRef.close();
+
+      });
   }
 
   onAddClick = () => {
+
+    this.id = undefined;
+
     this.editDialogRef = this.dialog.open(EditTodoComponent, {
       width: '400px',
-      data: {}
+      data: {} as ITodo
     });
 
     this.editDialogRef.componentInstance
-      .cancel.subscribe(() => this.editDialogRef.close());
+      .cancel.subscribe(() => {
+
+        this.todo = undefined;
+        this.editDialogRef.close();
+
+      });
+
     this.editDialogRef.componentInstance
-      .save.subscribe((todo: ITodo) => this.editDialogRef.close());
+      .save.subscribe((todo: ITodo) => {
+
+        this.store.dispatch(new CreateTodo(todo));
+        this.editDialogRef.close();
+
+      });
   }
 
-  constructor(private dialog: MatDialog, private store: Store<{ todos: ITodoState }>) {
+  /** Whether the number of selected elements matches the total number of rows. */
+  isAllSelected() {
+    const numSelected = this.selection.selected.length;
+    const numRows = this.dataSource.data.length;
+    return numSelected === numRows;
+  }
+
+  /** Selects all rows if they are not all selected; otherwise clear selection. */
+  masterToggle() {
+    this.isAllSelected() ?
+        this.selection.clear() :
+        this.dataSource.data.forEach(row => this.selection.select(row));
+  }
+
+  constructor(private dialog: MatDialog, private actions$: Actions, private store: Store<{ todos: ITodoState }>) {
     this.todo$ = this.store.pipe(select('todos'));
   }
+
   ngOnDestroy(): void {
     if (this.todosSubscription) {
       this.todosSubscription.unsubscribe();
+    }
+
+    if (this.createTodoSuccessSubscription) {
+      this.createTodoSuccessSubscription.unsubscribe();
+    }
+
+    if (this.editTodoSuccessSubscription) {
+      this.editTodoSuccessSubscription.unsubscribe();
+    }
+
+    if (this.deleteTodoSuccessSubscription) {
+      this.deleteTodoSuccessSubscription.unsubscribe();
     }
   }
 
   ngOnInit(): void {
     this.todosSubscription = this.todo$.pipe(
-      map(p => p.todos)
+      map(p => {
+        this.todos = p.todos;
+        this.todo = (this.id) ? p.todos.find((t: ITodo) => t.id === this.id) : null;
+      })
+    ).subscribe();
+
+    this.createTodoSuccessSubscription = this.actions$.pipe(
+      ofType(TodoActionTypes.CREATE_TODO_SUCCESS),
+      tap(error => {
+        console.log('Hi');
+        console.log(error);
+      })
+    ).subscribe();
+
+    this.editTodoSuccessSubscription = this.actions$.pipe(
+      ofType(TodoActionTypes.EDIT_TODO_SUCCESS),
+      tap(error => {
+        console.log('Hi');
+        console.log(error);
+      })
+    ).subscribe();
+
+    this.deleteTodoSuccessSubscription = this.actions$.pipe(
+      ofType(TodoActionTypes.DELETE_TODO_SUCCESS),
+      tap(error => {
+        console.log('Hi');
+        console.log(error);
+      })
     ).subscribe();
 
     this.store.dispatch(new GetTodos());

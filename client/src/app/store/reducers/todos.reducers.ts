@@ -11,7 +11,8 @@ export const todosReducers = (
         case TodoActionTypes.GET_TODOS_REQUEST: {
             return {
                 ...todoState,
-                loading: true
+                loading: true,
+                error: undefined
             };
         }
         case TodoActionTypes.GET_TODOS_SUCCESS: {
@@ -21,19 +22,22 @@ export const todosReducers = (
                     ...todoState.todos,
                     ...action.payload
                 ],
-                loading: false
+                loading: false,
+                error: undefined
             };
         }
         case TodoActionTypes.GET_TODOS_FAILURE: {
             return {
                 ...todoState,
-                loading: false
+                loading: false,
+                error: action.error
             };
         }
         case TodoActionTypes.GET_TODO_REQUEST: {
             return {
                 ...todoState,
-                loading: true
+                loading: true,
+                error: undefined
             };
         }
         case TodoActionTypes.GET_TODO_SUCCESS: {
@@ -43,13 +47,92 @@ export const todosReducers = (
                     ...todoState.todos,
                     action.payload
                 ],
-                loading: false
+                loading: false,
+                error: undefined
             };
         }
         case TodoActionTypes.GET_TODO_FAILURE: {
             return {
                 ...todoState,
-                loading: false
+                loading: false,
+                error: action.error
+            };
+        }
+
+        case TodoActionTypes.CREATE_TODO_REQUEST: {
+            return {
+                ...todoState,
+                loading: true,
+                error: undefined
+            };
+        }
+        case TodoActionTypes.CREATE_TODO_SUCCESS: {
+            return {
+                ...state,
+                todos: [
+                    ...todoState.todos,
+                    action.payload
+                ],
+                loading: false,
+                error: undefined
+            };
+        }
+        case TodoActionTypes.CREATE_TODO_FAILURE: {
+            return {
+                ...todoState,
+                loading: false,
+                error: action.error
+            };
+        }
+
+        case TodoActionTypes.EDIT_TODO_REQUEST: {
+            return {
+                ...todoState,
+                loading: true,
+                error: undefined
+            };
+        }
+        case TodoActionTypes.EDIT_TODO_SUCCESS: {
+            return {
+                ...state,
+                todos: [
+                    ...todoState.todos,
+                    action.payload
+                ],
+                loading: false,
+                error: undefined
+            };
+        }
+        case TodoActionTypes.EDIT_TODO_FAILURE: {
+            return {
+                ...todoState,
+                loading: false,
+                error: action.error
+            };
+        }
+
+        case TodoActionTypes.DELETE_TODO_REQUEST: {
+            return {
+                ...todoState,
+                loading: true,
+                error: undefined
+            };
+        }
+        case TodoActionTypes.DELETE_TODO_SUCCESS: {
+            return {
+                ...state,
+                todos: [
+                    ...todoState.todos.filter(p => p.id !== action.id)
+                ],
+                loading: false,
+                error: undefined
+            };
+        }
+        case TodoActionTypes.DELETE_TODO_FAILURE: {
+            return {
+                ...todoState,
+                loading: false,
+                error: action.error
             };
         }
 

@@ -21,13 +21,7 @@ export enum TodoActionTypes {
 
 export class GetTodos implements Action {
     public readonly type = TodoActionTypes.GET_TODOS_REQUEST;
-    public readonly page: number;
-    public readonly pageSize: number;
-
-    constructor(page = 0, pageSize = 10) {
-        this.page = page;
-        this.pageSize = pageSize;
-    }
+    constructor(public page = 0, public pageSize = 10) {}
 }
 
 export class GetTodosSuccess implements Action {
@@ -42,7 +36,7 @@ export class GetTodosFailure implements Action {
 
 export class GetTodo implements Action {
     public readonly type = TodoActionTypes.GET_TODO_REQUEST;
-    public readonly id: number;
+    public constructor(public id: number) {}
 }
 
 export class GetTodoSuccess implements Action {
@@ -57,7 +51,7 @@ export class GetTodoFailure implements Action {
 
 export class CreateTodo implements Action {
     public readonly type = TodoActionTypes.CREATE_TODO_REQUEST;
-    public readonly todo: ITodo;
+    public constructor(public todo: ITodo) {}
 }
 
 export class CreateTodoSuccess implements Action {
@@ -73,7 +67,8 @@ export class CreateTodoFailure implements Action {
 export class EditTodo implements Action {
     public readonly type = TodoActionTypes.EDIT_TODO_REQUEST;
     public readonly id: number;
-    public readonly todo: ITodo;
+
+    public constructor(public todo: ITodo) {}
 }
 
 export class EditTodoSuccess implements Action {
@@ -88,12 +83,12 @@ export class EditTodoFailure implements Action {
 
 export class DeleteTodo implements Action {
     public readonly type = TodoActionTypes.DELETE_TODO_REQUEST;
-    public readonly id: number;
+    public constructor(public id: number) {}
 }
 
 export class DeleteTodoSuccess implements Action {
     public readonly type = TodoActionTypes.DELETE_TODO_SUCCESS;
-    public constructor() {}
+    public constructor(public id: number) {}
 }
 
 export class DeleteTodoFailure implements Action {

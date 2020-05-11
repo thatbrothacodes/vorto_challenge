@@ -6,7 +6,9 @@
     </mat-form-field>
     <mat-form-field>
         <mat-label>Due Date</mat-label>
-        <input matInput [(ngModel)]="todo.dueDate">
+        <input matInput [matDatepicker]="datepicker" placeholder="Choose a date">
+        <mat-datepicker-toggle [for]="datepicker"></mat-datepicker-toggle>
+        <mat-datepicker #datepicker></mat-datepicker>
     </mat-form-field>
     <mat-form-field>
         <mat-label>Priority</mat-label>

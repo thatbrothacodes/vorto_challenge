@@ -1,7 +1,12 @@
 :host {
     width: 100%;
-    display: block;
+    display: flex;
+    flex-direction: column;
+    flex: 1 0 0;
     height: 100%;
+    > div {
+        align-self: flex-end;
+    }
 }
 
 table {
@@ -12,7 +17,6 @@ table {
     z-index: 1000;
     position: absolute;
     display: flex;
-    width: 100%;
     max-width: 1080px;
     align-items: flex-end;
     flex-direction: column;

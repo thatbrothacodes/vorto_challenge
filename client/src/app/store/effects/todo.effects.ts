@@ -79,7 +79,7 @@ export class TodoEffects {
         ofType<DeleteTodo>(TodoActionTypes.DELETE_TODO_REQUEST),
         mergeMap(action => {
             return this.http.delete(`${this.ApiURL}/${action.id}`).pipe(
-                    map(() => of(new DeleteTodoSuccess())),
+                    map(() => of(new DeleteTodoSuccess(action.id))),
                     catchError((err: Error) => of(new DeleteTodoFailure(err.message)))
                 );
         })
