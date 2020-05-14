@@ -21,7 +21,7 @@ export enum TodoActionTypes {
 
 export class GetTodos implements Action {
     public readonly type = TodoActionTypes.GET_TODOS_REQUEST;
-    constructor(public page = 0, public pageSize = 10) {}
+    constructor(public page = 1, public pageSize = 10) {}
 }
 
 export class GetTodosSuccess implements Action {
@@ -66,9 +66,8 @@ export class CreateTodoFailure implements Action {
 
 export class EditTodo implements Action {
     public readonly type = TodoActionTypes.EDIT_TODO_REQUEST;
-    public readonly id: number;
 
-    public constructor(public todo: ITodo) {}
+    public constructor(public id: number, public todo: ITodo) {}
 }
 
 export class EditTodoSuccess implements Action {

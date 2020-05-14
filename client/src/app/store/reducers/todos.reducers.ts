@@ -1,6 +1,5 @@
 import { ITodoState, initialTodoState } from '../state/todo.state';
 import { TodoActions, TodoActionTypes } from '../actions/todo.actions';
-import { state } from '@angular/animations';
 
 
 export const todosReducers = (
@@ -17,7 +16,7 @@ export const todosReducers = (
         }
         case TodoActionTypes.GET_TODOS_SUCCESS: {
             return {
-                ...state,
+                ...todoState,
                 todos: [
                     ...todoState.todos,
                     ...action.payload
@@ -42,9 +41,9 @@ export const todosReducers = (
         }
         case TodoActionTypes.GET_TODO_SUCCESS: {
             return {
-                ...state,
+                ...todoState,
                 todos: [
-                    ...todoState.todos,
+                    ...todoState.todos.filter(p => p.id !== action.payload.id),
                     action.payload
                 ],
                 loading: false,
@@ -68,7 +67,7 @@ export const todosReducers = (
         }
         case TodoActionTypes.CREATE_TODO_SUCCESS: {
             return {
-                ...state,
+                ...todoState,
                 todos: [
                     ...todoState.todos,
                     action.payload
@@ -94,9 +93,9 @@ export const todosReducers = (
         }
         case TodoActionTypes.EDIT_TODO_SUCCESS: {
             return {
-                ...state,
+                ...todoState,
                 todos: [
-                    ...todoState.todos,
+                    ...todoState.todos.filter(p => p.id !== action.payload.id),
                     action.payload
                 ],
                 loading: false,
@@ -120,7 +119,7 @@ export const todosReducers = (
         }
         case TodoActionTypes.DELETE_TODO_SUCCESS: {
             return {
-                ...state,
+                ...todoState,
                 todos: [
                     ...todoState.todos.filter(p => p.id !== action.id)
                 ],

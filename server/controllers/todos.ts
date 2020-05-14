@@ -2,13 +2,13 @@ import express from 'express';
 
 export default (db) => {
     const router = express.Router();
-    const pageSize = 25;
 
     router.get('/', async(req, res, next) => {
         const page = (req.query.page - 1) || 0;
+        const pageSize = (req.query.pageSize) || 25;
         
         try {
-            db.Todos.findAndCountAll({
+            db.Todos.findAll({
                 limit: pageSize,
                 offset: page * pageSize
             }).then(result => {
@@ -57,7 +57,7 @@ export default (db) => {
     router.post('/', async(req, res, next) => {
         try {
             db.Todos.create({
-                title: req.body.name,
+                title: req.body.title,
                 notes: req.body.notes,
                 dueDate: req.body.dueDate,
                 priority: req.body.priority,
@@ -85,7 +85,7 @@ export default (db) => {
     router.put('/:id', async(req, res, next) => {
         db.Todos.update(
             {
-                title: req.body.name,
+                title: req.body.title,
                 notes: req.body.notes,
                 dueDate: req.body.dueDate,
                 priority: req.body.priority,
@@ -108,6 +108,24 @@ export default (db) => {
             }
 
             res.status(404).send();
+            
+        }).catch(e => {
+            res.status(500).json({
+                error: 'Internal Sever Error'
+            });
+            next(e);
+        });
+    });
+
+    router.delete('/:id', async(req, res, next) => {
+        db.Todos.destroy(
+            { 
+                where : { 
+                    id: req.params.id
+                }
+            }
+        ).then((item) => {
+            res.status(204).json();
             
         }).catch(e => {
             res.status(500).json({

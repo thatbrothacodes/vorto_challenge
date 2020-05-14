@@ -10,14 +10,14 @@ import ITodo from '../../models/todo';
 export class DeleteTodoComponent {
 
   @Output() cancel: EventEmitter<void> = new EventEmitter();
-  @Output() delete: EventEmitter<ITodo> = new EventEmitter();
+  @Output() delete: EventEmitter<number> = new EventEmitter();
 
   onCancelClick = () => {
     this.cancel.emit();
   }
 
   onDeleteClick = (todo: ITodo) => {
-    this.delete.emit(todo);
+    this.delete.emit(todo.id);
   }
 
   constructor(@Inject(MAT_DIALOG_DATA) public todo: ITodo) { }

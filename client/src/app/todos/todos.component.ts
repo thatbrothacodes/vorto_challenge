@@ -13,26 +13,6 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { MatTableDataSource } from '@angular/material/table';
 import { Actions, ofType } from '@ngrx/effects';
 
-export interface PeriodicElement {
-  name: string;
-  position: number;
-  weight: number;
-  symbol: string;
-}
-
-const ELEMENT_DATA: Array<PeriodicElement> = [
-  {position: 1, name: 'Hydrogen', weight: 1.0079, symbol: 'H'},
-  {position: 2, name: 'Helium', weight: 4.0026, symbol: 'He'},
-  {position: 3, name: 'Lithium', weight: 6.941, symbol: 'Li'},
-  {position: 4, name: 'Beryllium', weight: 9.0122, symbol: 'Be'},
-  {position: 5, name: 'Boron', weight: 10.811, symbol: 'B'},
-  {position: 6, name: 'Carbon', weight: 12.0107, symbol: 'C'},
-  {position: 7, name: 'Nitrogen', weight: 14.0067, symbol: 'N'},
-  {position: 8, name: 'Oxygen', weight: 15.9994, symbol: 'O'},
-  {position: 9, name: 'Fluorine', weight: 18.9984, symbol: 'F'},
-  {position: 10, name: 'Neon', weight: 20.1797, symbol: 'Ne'},
-];
-
 @Component({
   selector: 'app-todos',
   templateUrl: './todos.component.html',
@@ -49,23 +29,22 @@ export class TodosComponent implements OnInit, OnDestroy {
   deleteDialogRef: MatDialogRef<DeleteTodoComponent>;
   viewDialogRef: MatDialogRef<ViewTodoComponent>;
 
-  displayedColumns: string[] = ['select', 'name', 'weight', 'symbol', 'actions'];
-  dataSource = new MatTableDataSource<PeriodicElement>(ELEMENT_DATA);
-  initialSelection = [];
-  allowMultiSelect = true;
-  selection = new SelectionModel<PeriodicElement>(this.allowMultiSelect, this.initialSelection);
   id: number;
   todos: Array<ITodo> = [];
   todo: ITodo = undefined;
+  displayedColumns: string[] = ['select', 'title', 'priority', 'created', 'actions'];
+  dataSource = new MatTableDataSource<ITodo>([]);
+  initialSelection = [];
+  allowMultiSelect = true;
+  selection = new SelectionModel<ITodo>(this.allowMultiSelect, this.initialSelection);
 
   onEditClick = (id) => {
-    console.log(id);
     this.id = id;
     this.store.dispatch(new GetTodo(id));
 
     this.editDialogRef = this.dialog.open(EditTodoComponent, {
       width: '400px',
-      data: this.todo ? this.todo : {} as ITodo
+      data: this.todo
     });
 
     this.editDialogRef.componentInstance
@@ -79,8 +58,7 @@ export class TodosComponent implements OnInit, OnDestroy {
     this.editDialogRef.componentInstance
       .save.subscribe((todo: ITodo) => {
 
-        this.store.dispatch(new EditTodo(todo));
-        this.editDialogRef.close();
+        this.store.dispatch(new EditTodo(id, todo));
 
       });
   }
@@ -160,9 +138,28 @@ export class TodosComponent implements OnInit, OnDestroy {
       .save.subscribe((todo: ITodo) => {
 
         this.store.dispatch(new CreateTodo(todo));
-        this.editDialogRef.close();
 
       });
+  }
+
+  onArchiveClick = (id: number) => {
+    const archivedTodo = {
+      ...this.todo,
+      archived: true,
+      archivedDate: Date.now()
+    };
+
+    this.store.dispatch(new EditTodo(id, archivedTodo));
+  }
+
+  onUnarchiveClick = (id: number) => {
+    const archivedTodo = {
+      ...this.todo,
+      archived: false,
+      archivedDate: null
+    };
+
+    this.store.dispatch(new EditTodo(id, archivedTodo));
   }
 
   /** Whether the number of selected elements matches the total number of rows. */
@@ -204,32 +201,29 @@ export class TodosComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.todosSubscription = this.todo$.pipe(
       map(p => {
-        this.todos = p.todos;
+        this.dataSource = new MatTableDataSource<ITodo>(p.todos);
         this.todo = (this.id) ? p.todos.find((t: ITodo) => t.id === this.id) : null;
       })
     ).subscribe();
 
     this.createTodoSuccessSubscription = this.actions$.pipe(
       ofType(TodoActionTypes.CREATE_TODO_SUCCESS),
-      tap(error => {
-        console.log('Hi');
-        console.log(error);
+      tap(() => {
+        this.editDialogRef.close();
       })
     ).subscribe();
 
     this.editTodoSuccessSubscription = this.actions$.pipe(
       ofType(TodoActionTypes.EDIT_TODO_SUCCESS),
-      tap(error => {
-        console.log('Hi');
-        console.log(error);
+      tap(() => {
+        this.editDialogRef.close();
       })
     ).subscribe();
 
     this.deleteTodoSuccessSubscription = this.actions$.pipe(
       ofType(TodoActionTypes.DELETE_TODO_SUCCESS),
-      tap(error => {
-        console.log('Hi');
-        console.log(error);
+      tap(() => {
+        this.deleteDialogRef.close();
       })
     ).subscribe();
 

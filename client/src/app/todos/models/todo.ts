@@ -8,6 +8,6 @@ export default interface ITodo {
     archiveDate?: Date;
     completed: boolean;
     completeDate?: Date;
-    modifiedDate?: Date;
-    createDate: Date;
+    updatedAt?: Date;
+    createdAt: Date;
 }

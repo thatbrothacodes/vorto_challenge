@@ -1,32 +1,36 @@
-<h1 mat-dialog-title>Add</h1>
+<h1 *ngIf="!todo.id" mat-dialog-title>Add</h1>
+<h1 *ngIf="todo.id" mat-dialog-title>Edit</h1>
 <div mat-dialog-content>
-    <mat-form-field>
-        <mat-label>Title</mat-label>
-        <input matInput [(ngModel)]="todo.title">
-    </mat-form-field>
-    <mat-form-field>
-        <mat-label>Due Date</mat-label>
-        <input matInput [matDatepicker]="datepicker" placeholder="Choose a date">
-        <mat-datepicker-toggle [for]="datepicker"></mat-datepicker-toggle>
-        <mat-datepicker #datepicker></mat-datepicker>
-    </mat-form-field>
-    <mat-form-field>
-        <mat-label>Priority</mat-label>
-        <select matNativeControl [(ngModel)]="todo.priority">
-            <option value="2">High</option>
-            <option value="1">Medium</option>
-            <option value="0">Low</option>
-        </select>
-    </mat-form-field>
-    <mat-form-field>
-        <mat-label>Notes</mat-label>
-        <textarea
-            [(ngModel)]="todo.notes"
-            matInput 
-            cdkTextareaAutosize></textarea>
-    </mat-form-field>
+    <form #todoForm="ngForm" (ngSubmit)="onSubmit(todoForm)">
+        <mat-form-field appearance="fill">
+            <mat-label>Title</mat-label>
+            <input matInput name="title" [(ngModel)]="title" required>
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+            <mat-label>Due Date</mat-label>
+            <input name="dueDate" matInput [(ngModel)]="dueDate" [matDatepicker]="datepicker">
+            <mat-datepicker-toggle [for]="datepicker"></mat-datepicker-toggle>
+            <mat-datepicker #datepicker></mat-datepicker>
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+            <mat-label>Priority</mat-label>
+            <select matNativeControl name="priority" [(ngModel)]="priority">
+                <option value="2">High</option>
+                <option value="1">Medium</option>
+                <option value="0">Low</option>
+            </select>
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+            <mat-label>Notes</mat-label>
+            <textarea
+                name="notes"
+                [(ngModel)]="notes"
+                matInput 
+                cdkTextareaAutosize></textarea>
+        </mat-form-field>
+    </form>
 </div>
 <div mat-dialog-actions>
   <button mat-button (click)="onCancelClick()">Cancel</button>
-  <button mat-button (click)="onSaveClick(todo)" cdkFocusInitial>Save</button>
+  <button mat-button (click)="todoForm.ngSubmit.emit(todoForm)" cdkFocusInitial>Save</button>
 </div>

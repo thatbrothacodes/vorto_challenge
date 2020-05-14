@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Effect, Actions, ofType } from '@ngrx/effects';
-import { catchError, map, mergeMap } from 'rxjs/operators';
+import { catchError, map, mergeMap, switchMap } from 'rxjs/operators';
 import {
     GetTodos,
     GetTodoSuccess,
@@ -26,7 +26,7 @@ import ITodo from 'src/app/todos/models/todo';
 
 @Injectable()
 export class TodoEffects {
-    private ApiURL = 'https://localhost:3000/todos';
+    private ApiURL = 'http://localhost:4000/todos';
 
     @Effect()
     getTodos$ = this.actions$.pipe(
@@ -35,7 +35,7 @@ export class TodoEffects {
             return this.http.get(this.ApiURL, {
                 params: { pageSize: action.pageSize.toString(), page: action.page.toString()}
             }).pipe(
-                    map((todos: Array<ITodo>) => of(new GetTodosSuccess(todos))),
+                    map((todos: Array<ITodo>) => new GetTodosSuccess(todos)),
                     catchError((err: Error) => of(new GetTodosFailure(err.message)))
                 );
         })
@@ -46,7 +46,7 @@ export class TodoEffects {
         ofType<GetTodo>(TodoActionTypes.GET_TODO_REQUEST),
         mergeMap(action => {
             return this.http.get(`${this.ApiURL}/${action.id}`).pipe(
-                    map((todo: ITodo) => of(new GetTodoSuccess(todo))),
+                    map((todo: ITodo) => new GetTodoSuccess(todo)),
                     catchError((err: Error) => of(new GetTodoFailure(err.message)))
                 );
         })
@@ -57,7 +57,7 @@ export class TodoEffects {
         ofType<CreateTodo>(TodoActionTypes.CREATE_TODO_REQUEST),
         mergeMap(action => {
             return this.http.post(this.ApiURL, action.todo).pipe(
-                    map((todo: ITodo) => of(new CreateTodoSuccess(todo))),
+                    map(() => new CreateTodoSuccess(action.todo)),
                     catchError((err: Error) => of(new CreateTodoFailure(err.message)))
                 );
         })
@@ -68,7 +68,7 @@ export class TodoEffects {
         ofType<EditTodo>(TodoActionTypes.EDIT_TODO_REQUEST),
         mergeMap(action => {
             return this.http.put(`${this.ApiURL}/${action.id}`, action.todo).pipe(
-                    map((todo: ITodo) => of(new EditTodoSuccess(todo))),
+                    map(() => new EditTodoSuccess(action.todo)),
                     catchError((err: Error) => of(new EditTodoFailure(err.message)))
                 );
         })
@@ -79,7 +79,7 @@ export class TodoEffects {
         ofType<DeleteTodo>(TodoActionTypes.DELETE_TODO_REQUEST),
         mergeMap(action => {
             return this.http.delete(`${this.ApiURL}/${action.id}`).pipe(
-                    map(() => of(new DeleteTodoSuccess(action.id))),
+                    map(() => new DeleteTodoSuccess(action.id)),
                     catchError((err: Error) => of(new DeleteTodoFailure(err.message)))
                 );
         })
