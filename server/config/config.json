@@ -1,23 +1,22 @@
 {
   "development": {
     "username": "API_VORTO",
-    "password": null,
+    "password": "P@ssw0rd!",
     "database": "vorto_challenge",
     "host": "127.0.0.1",
     "dialect": "postgres"
   },
   "test": {
     "username": "API_VORTO",
-    "password": null,
+    "password": "P@ssw0rd!",
     "database": "vorto_challenge",
     "host": "127.0.0.1",
     "dialect": "postgres"
   },
   "production": {
-    "username": "root",
-    "password": null,
-    "database": "database_production",
-    "host": "127.0.0.1",
-    "dialect": "mysql"
+    "username": "API_VORTO",
+    "database": "vorto_challenge",
+    "host": "postgres",
+    "dialect": "postgres"
   }
 }

@@ -17,12 +17,12 @@
       ]
     },
     "include": [
+      "config/config.json",
       "**/*.ts"
     ],
     "exclude": [
       "node_modules",
       "migrations",
-      "config",
       "seeders",
       "**/*.spec.ts",
       "**/__tests__/*.ts"

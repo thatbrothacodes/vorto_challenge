@@ -1,0 +1,37 @@
+version: "3"
+
+services:
+  postgres:
+    container_name: vorto-challenge-db
+    restart: always
+    image: postgres:12.2-alpine
+    environment:
+      POSTGRES_DB: vorto_challenge
+      POSTGRES_PASSWORD: P@ssw0rd!
+    # ports:
+    #     - "5005:5432"
+    expose: 
+      - 5432
+    volumes:
+      - ./server/postgres-data:/var/lib/postgresql/data
+  VORTO_CHALLENGE-SERVER:
+    build: ./server
+    container_name: vorto-challenge-server
+    depends_on:
+      - postgres
+    links:
+      - postgres
+    environment:
+      - NODE_ENV=production
+    image: vorto-challenge-server:0.1.0
+    ports:
+      - "4000:4000"
+  VORTO_CHALLENGE-CLIENT:
+    build: ./client
+    container_name: vorto-challenge-client
+    depends_on:
+      - VORTO_CHALLENGE-SERVER
+    image: vorto-challenge-client:0.1.0
+    ports:
+      - "4200:4200"
+
